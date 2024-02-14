@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+  <%-include('common/header.ejs')%>
+  <body>
+    <%-include('common/menu.ejs')%>
+
+    <div class="container mt-4">
+      <div class="mb-3 text-left">
+        <button class="btn btn-primary" onclick="openAddModal()">Add Application</button>
+      </div>
+      <table id="dataTable" class="table table-bordered table-hover" style="width: 100%">
+        <thead>
+          <tr>
+            <th>app_id</th>
+            <th>app_eui</th>
+            <th>app_type</th>
+            <th>protocol</th>
+            <th>address</th>
+            <th>port</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+
+    <!-- Add Application Modal -->
+    <div class="modal fade" id="addApplicationModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Application</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>app_id</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="app_id" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>app_type</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="app_type">
+                    <option value="MIN">MIN</option>
+                    <option value="OCF">OCF</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">protocol</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="protocol">
+                    <option value="MQTT">MQTT</option>
+                    <option value="HTTP">HTTP</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>address</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="address" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>port</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="port" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">path</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="path" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">username</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="username" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">password</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="password" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">description</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="description" />
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="addApplication()">Add Application</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Application Modal -->
+    <div class="modal fade" id="updateApplicationModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Update Application</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">app_id</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="app_id" readonly />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">app_eui</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="app_eui" readonly />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>app_type</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="app_type">
+                    <option value="MIN">MIN</option>
+                    <option value="OCF">OCF</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">protocol</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="protocol">
+                    <option value="MQTT">MQTT</option>
+                    <option value="HTTP">HTTP</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>address</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="address" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>port</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="port" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">path</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="path" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">username</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="username" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">password</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="password" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">description</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="description" />
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="updateApplication()">Update Application</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%-include('common/script.ejs')%>
+
+    <script>
+      function openAddModal() {
+        const modal = $('#addApplicationModal');
+        modal.find('[name=app_id]').val('');
+        modal.find('[name=app_type]').val('MIN');
+        modal.find('[name=protocol]').val('MQTT');
+        modal.find('[name=address]').val('');
+        modal.find('[name=port]').val('');
+        modal.find('[name=path]').val('');
+        modal.find('[name=username]').val('');
+        modal.find('[name=password]').val('');
+        modal.find('[name=description]').val('');
+        modal.modal(true);
+      }
+
+      function openUpdate(rowIndex) {
+        const data = $('#dataTable').DataTable().row(rowIndex).data();
+        const modal = $('#updateApplicationModal');
+        modal.find('[name=app_id]').val(data.app_id);
+        modal.find('[name=app_eui]').val(data.app_eui);
+        modal.find('[name=app_type]').val(data.app_type);
+        modal.find('[name=protocol]').val(data.protocol || 'MQTT');
+        modal.find('[name=address]').val(data.address);
+        modal.find('[name=port]').val(data.port);
+        modal.find('[name=path]').val(data.path);
+        modal.find('[name=username]').val(data.username);
+        modal.find('[name=password]').val(data.password);
+        modal.find('[name=description]').val(data.description);
+        modal.modal(true);
+      }
+
+      function deleteApplication(applicationId) {
+        $.ajax({
+          type: 'DELETE',
+          url: `/api/v1/application/appid/${applicationId}`,
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (application) => {
+            loadApplicationList();
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+      }
+
+      function updateApplication() {
+        const modal = $('#updateApplicationModal');
+        const appId = modal.find('[name=app_id]').val();
+        const applicationData = {
+          app_type: modal.find('[name=app_type]').val().trim(),
+          protocol: modal.find('[name=protocol]').val().trim(),
+          address: modal.find('[name=address]').val().trim(),
+          port: modal.find('[name=port]').val().trim(),
+          path: modal.find('[name=path]').val().trim(),
+          username: modal.find('[name=username]').val().trim(),
+          password: modal.find('[name=password]').val().trim(),
+          description: modal.find('[name=description]').val().trim(),
+        };
+
+        $.ajax({
+          type: 'PUT',
+          url: `/api/v1/application/appid/${appId}`,
+          data: applicationData,
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (user) => {
+            loadApplicationList();
+            modal.modal('hide');
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+      }
+
+      function addApplication() {
+        const modal = $('#addApplicationModal');
+        const newApplication = {
+          app_id: modal.find('[name=app_id]').val().trim(),
+          app_type: modal.find('[name=app_type]').val().trim(),
+          protocol: modal.find('[name=protocol]').val().trim(),
+          address: modal.find('[name=address]').val().trim(),
+          port: modal.find('[name=port]').val().trim(),
+          path: modal.find('[name=path]').val().trim(),
+          username: modal.find('[name=username]').val().trim(),
+          password: modal.find('[name=password]').val().trim(),
+          description: modal.find('[name=description]').val().trim(),
+        };
+        if (
+          newApplication.app_id &&
+          newApplication.app_type &&
+          newApplication.protocol &&
+          newApplication.address &&
+          newApplication.port
+        ) {
+          $.ajax({
+            type: 'POST',
+            url: '/api/v1/application',
+            data: newApplication,
+            headers: {
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+            success: (application) => {
+              loadApplicationList();
+              modal.modal('hide');
+            },
+            error: (err) => {
+              alert(err.responseJSON.error_description);
+            },
+          });
+        }
+      }
+
+      function loadApplicationList() {
+        const table = $('#dataTable').DataTable({
+          destroy: true,
+          // sDom: 'f t<"col-sm-12" i p>',
+          responsive: true,
+          ajax: {
+            url: '/api/v1/application',
+            headers: {
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+            dataSrc: '',
+          },
+          columns: [
+            {
+              data: 'app_id',
+              className: 'text-wrap',
+              render: (appId, type, row, index) => {
+                return `<a href="javascript:openUpdate(${index.row});">${appId}</a>`;
+              },
+            },
+            { data: 'app_eui', className: 'text-wrap' },
+            { data: 'app_type', className: 'text-wrap' },
+            { data: 'protocol', className: 'text-wrap' },
+            { data: 'address', className: 'text-wrap' },
+            { data: 'port', className: 'text-wrap' },
+            {
+              data: 'app_id',
+              render: (appId) => {
+                return `<button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteApplication('${appId}')">Delete</button>`;
+              },
+            },
+          ],
+        });
+      }
+
+      //load data
+      $(document).ready(async function () {
+        if (!ACCESS_TOKEN) {
+          location.href = '/login';
+        } else {
+          loadApplicationList();
+        }
+      });
+    </script>
+  </body>
+</html>

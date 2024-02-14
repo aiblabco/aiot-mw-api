@@ -1,0 +1,47 @@
+services:  
+  aiot-mw-api:
+    container_name: aiot-mw-api
+    environment:
+      SERVICE_PROTOCOL: http
+      SERVICE_HOST: $SERVICE_HOST$
+      PORT: $PORT$
+      EDGEX_HOST: $EDGEX_HOST$
+      EDGEX_CORE_DATA_PORT: $EDGEX_CORE_DATA_PORT$
+      EDGEX_CORE_METADATA_PORT: $EDGEX_CORE_METADATA_PORT$
+      EDGEX_COMMAND_PORT: $EDGEX_COMMAND_PORT$
+      EDGEX_DEVICE_MQTT_PORT: $EDGEX_DEVICE_MQTT_PORT$
+      EDGEX_DEVICE_MQTT_CLIENT_ID: $EDGEX_DEVICE_MQTT_CLIENT_ID$
+      LNS_HOST: $LNS_HOST$
+      LNS_API_PORT: $LNS_API_PORT$
+      LNS_AUTH_PORT: $LNS_AUTH_PORT$
+      LNS_USERNAME: $LNS_USERNAME$
+      LNS_PASSWORD: $LNS_PASSWORD$
+      LNS_AUTHORIZATION_BASIC: $LNS_AUTHORIZATION_BASIC$
+      JWT_SECRET: thisisasamplesecret
+      JWT_ACCESS_EXPIRATION_MINUTES: 1440
+      JWT_REFRESH_EXPIRATION_DAYS: 30
+      JWT_RESET_PASSWORD_EXPIRATION_MINUTES: 60
+      JWT_VERIFY_EMAIL_EXPIRATION_MINUTES: 60
+      AIOTMW_EDGEMWID: AIoT_MW_01
+      AIOTMW_TITLE: Seongnam Smartcity AIoT edge middleware 01
+      AIOTMW_DESCRIPTION: Seongnam Smartcity AIoT edge middleware 01
+      AIOTMW_VERSION: v1.1.231004
+      AIOTMW_PATH: /api/v1
+      MQTT_SERVICE_NAME: device-mqtt
+      APP_DEFAULT_PRIORITY: 1
+      APP_CH_ACCESS_TYPE: p
+      APP_DEFAULT_IFS: 0
+      APP_MIN_CW: 0
+      APP_MAX_CW: 7
+    image: aiblabco/aiot-mw-api:latest
+    ports:
+    - 59770:59770/tcp
+    volumes:
+    - ./db-data/mw-api/:/usr/src/node-app/src/daos/sqlite/db/
+
+version: '3.7'
+volumes:
+  consul-config: {}
+  consul-data: {}
+  db-data: {}
+  kuiper-data: {}

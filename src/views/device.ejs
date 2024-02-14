@@ -1,0 +1,876 @@
+<!doctype html>
+<html lang="en">
+  <%-include('common/header.ejs')%>
+  <body>
+    <%-include('common/menu.ejs')%>
+
+    <div class="container mt-4">
+      <div class="row">
+        <div class="mb-3 text-left col-sm-6">
+          <button class="btn btn-primary" onclick="openAddModal()">Add Device</button>
+          <button class="btn btn-primary" onclick="openAddGroupModal()">Add Device Group</button>
+        </div>
+        <div class="mb-3 text-right col-sm-6">
+          <button class="btn btn-danger" onclick="openDeleteGroupModal()">Delete Device Group</button>
+        </div>
+      </div>
+      <table id="dataTable" class="table table-bordered table-hover" style="width: 100%">
+        <thead>
+          <tr>
+            <th>dev_id</th>
+            <th>dev_eui</th>
+            <th>app_id</th>
+            <th>device_profile</th>
+            <th>network_profile</th>
+            <th>reading</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+
+    <!-- Add DeviceGroup Modal -->
+    <div class="modal fade" id="addDeviceGroupModal">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Device Group</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <pre id="addDeviceGroupEditor" class="editor_area"></pre>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="addDeviceGroup()">Add Device Group</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Add DeviceGroupResult Modal -->
+    <div class="modal fade" id="addDeviceGroupResultModal">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Device Group Result</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <pre id="addDeviceGroupResultEditor" class="editor_area"></pre>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete DeviceGroup Modal -->
+    <div class="modal fade" id="deleteDeviceGroupModal">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Delete Device Group</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <pre id="deleteDeviceGroupEditor" class="editor_area"></pre>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="deleteDeviceGroup()">Delete Device Group</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Delete DeviceGroupResult Modal -->
+    <div class="modal fade" id="deleteDeviceGroupResultModal">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Delete Device Group Result</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <pre id="deleteDeviceGroupResultEditor" class="editor_area"></pre>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--! Data Reading Modal -->
+    <div class="modal fade" id="dataReadingModal">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Data reading</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group row">
+              <label class="col-sm-2 col-form-label">resource</label>
+              <div class="col-sm-5">
+                <select class="form-control" name="resource"></select>
+              </div>
+              <label class="col-sm-1 col-form-label">count</label>
+              <div class="col-sm-2">
+                <input type="number" max="100" min="1" class="form-control" name="count" value="10" />
+              </div>
+              <div class="col-sm-2 text-right">
+                <button type="button" class="btn btn-primary" id="loadDeviceResourceData">Load</button>
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-sm-12">
+                <ul class="nav nav-tabs">
+                  <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" id="rawTab" href="#rawDataView" draggable="false">Raw</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#chartView" id="chartTab" draggable="false">Chart</a>
+                  </li>
+                </ul>
+                <div class="tab-content mt-2">
+                  <div class="tab-pane show active" id="rawDataView">
+                    <pre id="dataReadingEditor" class="editor_area"></pre>
+                  </div>
+                  <div class="tab-pane" id="chartView">
+                    <pre id="dataChartingArea" class="chart_area"></pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Device Modal -->
+    <div class="modal fade" id="addDeviceModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Device</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>dev_id</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="dev_id" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">dev_eui</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="dev_eui" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>app_id</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="app_id"></select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">dev_addr</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="dev_addr" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>enabled</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="enabled">
+                    <option value="1">TRUE</option>
+                    <option value="0">FALSE</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">description</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="description" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">latitude</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="latitude" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">longitude</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="longitude" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">altitude</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="altitude" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>device_profile</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="device_profile"></select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>network_profile</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="network_profile"></select>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="addDevice()">Add Device</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Device Modal -->
+    <div class="modal fade" id="updateDeviceModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Update Device</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>dev_id</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="dev_id" readonly />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">dev_eui</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="dev_eui" readonly />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>app_id</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="app_id" readonly></select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">dev_addr</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="dev_addr" readonly />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>enabled</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="enabled">
+                    <option value="1">TRUE</option>
+                    <option value="0">FALSE</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">description</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="description" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">latitude</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="latitude" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">longitude</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="longitude" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">altitude</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="altitude" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>device_profile</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="device_profile" readonly></select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>network_profile</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="network_profile" readonly></select>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="updateDevice()">Update Device</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%-include('common/script.ejs')%>
+
+    <script>
+      let addDeviceGroupEditor;
+      let addDeviceGroupResultEditor;
+      let deleteDeviceGroupEditor;
+      let deleteDeviceGroupResultEditor;
+      let dataReadingEditor;
+
+      let networkProfiles = [];
+      let deviceProfiles = [];
+      let applications = [];
+      let objectTypes = [];
+
+      function loadComboData() {
+        $.ajax({
+          type: 'GET',
+          url: '/api/v1/application',
+          contentType: 'application/json',
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (result) => {
+            applications = result;
+            $('[name=app_id]').each((i, e) => {
+              $(e).empty();
+              for (let app of result) {
+                $(e).append(`<option value="${app.app_id}">${app.app_id}</option>`);
+              }
+            });
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+        $.ajax({
+          type: 'GET',
+          url: '/api/v1/profile/device',
+          contentType: 'application/json',
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (result) => {
+            deviceProfiles = result;
+            $('[name=device_profile]').each((i, e) => {
+              $(e).empty();
+              for (let profile of result) {
+                $(e).append(`<option value="${profile.name}">${profile.name}</option>`);
+              }
+            });
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+        $.ajax({
+          type: 'GET',
+          url: '/api/v1/profile/network',
+          contentType: 'application/json',
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (result) => {
+            networkProfiles = result;
+            $('[name=network_profile]').each((i, e) => {
+              $(e).empty();
+              for (let profile of result) {
+                $(e).append(`<option value="${profile.name}">${profile.name}</option>`);
+              }
+            });
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+        $.ajax({
+          type: 'GET',
+          url: '/api/v1/profile/device/objectType',
+          contentType: 'application/json',
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (result) => {
+            objectTypes = result;
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+      }
+
+      const MAX_COUNT = 100;
+      const MIN_COUNT = 1;
+      function openDataReading(rowIndex) {
+        const device = $('#dataTable').DataTable().row(rowIndex).data();
+        const modal = $('#dataReadingModal');
+        modal.find('#rawTab').trigger('click'); // click raw tab
+        const loadBtn = modal.find('#loadDeviceResourceData');
+        const resourceSelect = modal.find('[name=resource]').empty();
+        const countInput = modal.find('[name=count]');
+        const profile = deviceProfiles.find((item) => item.name == device.device_profile);
+        if (profile) {
+          profile.resources.forEach((item) => {
+            resourceSelect.append(`<option value="${item.name}">${item.name}</option>`);
+          });
+          const loadData = () => {
+            let count = countInput.val();
+            if (count > MAX_COUNT) {
+              count = MAX_COUNT;
+              countInput.val(MAX_COUNT);
+            }
+            if (count < MIN_COUNT) {
+              count = MIN_COUNT;
+              countInput.val(MIN_COUNT);
+            }
+            $.ajax({
+              type: 'GET',
+              url: `/api/v1/data/recent/${device.dev_id}/${resourceSelect.val()}/${countInput.val()}`,
+              contentType: 'application/json',
+              headers: {
+                Authorization: `Bearer ${ACCESS_TOKEN}`,
+              },
+              success: (data) => {
+                dataReadingEditor = setMonacoEditor(
+                  dataReadingEditor,
+                  'dataReadingEditor',
+                  'json',
+                  JSON.stringify(data, null, '\t'),
+                );
+
+                var chartDom = document.getElementById('dataChartingArea');
+                var dataChart = echarts.init(chartDom);
+                if (data.readings.length == 0) {
+                  dataChart.dispose();
+                  return;
+                }
+
+                data.readings.sort((a, b) => {
+                  return a.created - b.created;
+                });
+
+                const xAxis = data.readings.map((item) => {
+                  return moment(parseInt(item.created)).format('HH:mm:ss');
+                });
+                const series = [];
+
+                if (data.type === 'Simple') {
+                  series.push({
+                    name: data.resource_name,
+                    type: 'line',
+                    data: data.readings.map((item) => {
+                      return item.value;
+                    }),
+                  });
+                } else if (data.type === 'Object') {
+                  const selectedResourceObjectType = profile.resources.find((item) => item.name == resourceSelect.val());
+                  const objectType = objectTypes.find((item) => item.name == selectedResourceObjectType.value_type);
+                  if (objectType) {
+                    const object = data.readings[0].value;
+                    for (const key in object) {
+                      const property = objectType.object_properties.find((item) => item.name == key);
+                      if (property?.units) {
+                        series.push({
+                          name: key,
+                          type: 'line',
+                          data: data.readings.map((item) => {
+                            return item.value[key];
+                          }),
+                        });
+                      }
+                    }
+                  }
+                }
+
+                const options = {
+                  tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                      type: 'cross',
+                    },
+                    formatter: (param) => {
+                      if (data.type === 'Simple') {
+                        return `
+                          ${param[0].name} <br>
+                          ${param[0].marker}&nbsp;&nbsp;${param[0].value ?? '- '} ${data.units}`;
+                      } else if (data.type === 'Object') {
+                        const tooltipBox = [`${param[0].name}`];
+                        param.forEach((item) => {
+                          tooltipBox.push(`${item.marker}${item.seriesName}:&nbsp;&nbsp;${item.value ?? '- '}`);
+                        });
+                        return tooltipBox.join('<br>');
+                      } else {
+                        return '';
+                      }
+                    },
+                  },
+                  legend: {
+                    data: series.map((item) => item.name),
+                  },
+                  xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: xAxis,
+                  },
+                  grid: { containLabel: true },
+                  yAxis: {
+                    type: 'value',
+                    boundaryGap: [0, '20%'],
+                    offset: 0,
+                    axisLabel: {
+                      formatter: `{value} ${data.units}`,
+                    },
+                    axisPointer: {
+                      snap: true,
+                    },
+                  },
+                  series: series,
+                };
+
+                dataChart.setOption(options);
+                $('#chartTab').click(() => {
+                  setTimeout(() => {
+                    dataChart.resize();
+                  }, 1);
+                });
+                window.onresize = () => {
+                  dataChart.resize();
+                };
+                // modal.unbind('shown.bs.modal');
+                // modal.on('shown.bs.modal', function () {
+                //   console.log('rere');
+                //   dataChart.resize();
+                // });
+                // modal.unbind('shown.bs.modal');
+                // modal.on('shown.bs.modal', function () {
+                //   console.log('rere');
+                //   dataChart.resize();
+                // });
+              },
+              error: (err) => {
+                alert(err.responseJSON.error_description);
+              },
+            });
+          };
+
+          loadBtn.unbind('click');
+          loadBtn.bind('click', loadData);
+          loadData();
+        }
+        modal.modal();
+      }
+
+      function openAddModal() {
+        const modal = $('#addDeviceModal');
+        modal.find('[name=dev_id]').val('');
+        modal.find('[name=dev_eui]').val('');
+        modal.find('[name=app_id]').val('');
+        modal.find('[name=dev_addr]').val('');
+        modal.find('[name=enabled]').val('1');
+        modal.find('[name=description]').val('');
+        modal.find('[name=latitude]').val('');
+        modal.find('[name=longitude]').val('');
+        modal.find('[name=altitude]').val('');
+        modal.find('[name=device_profile]').val('');
+        modal.find('[name=network_profile]').val('');
+        modal.modal(true);
+      }
+
+      function openAddGroupModal() {
+        const modal = $('#addDeviceGroupModal');
+        const deviceGroupTemplate = {
+          devices: [
+            {
+              dev_id: 'test_dev_abp_03',
+              dev_eui: '',
+              app_id: 'test_app_001',
+              dev_addr: '123',
+              enabled: 1,
+              description: '123',
+              latitude: 123,
+              longitude: 123,
+              altitude: 1,
+              device_profile: 'sample',
+              network_profile: 'test_network_abp',
+            },
+            {
+              dev_id: 'test_dev_abp_04',
+              dev_eui: '',
+              app_id: 'test_app_001',
+              dev_addr: '123',
+              enabled: 1,
+              description: '123',
+              latitude: 123,
+              longitude: 123,
+              altitude: 1,
+              device_profile: 'sample2',
+              network_profile: 'test_network_abp',
+            },
+          ],
+        };
+        addDeviceGroupEditor = setMonacoEditor(
+          addDeviceGroupEditor,
+          'addDeviceGroupEditor',
+          'json',
+          JSON.stringify(deviceGroupTemplate, null, '\t'),
+        );
+        modal.modal(true);
+      }
+
+      function openDeleteGroupModal() {
+        const modal = $('#deleteDeviceGroupModal');
+        const deviceGroupTemplate = {
+          devices: ['test_dev_abp_031', 'test_dev_abp_041'],
+        };
+        deleteDeviceGroupEditor = setMonacoEditor(
+          deleteDeviceGroupEditor,
+          'deleteDeviceGroupEditor',
+          'json',
+          JSON.stringify(deviceGroupTemplate, null, '\t'),
+        );
+        modal.modal(true);
+      }
+
+      function openUpdate(rowIndex) {
+        const data = $('#dataTable').DataTable().row(rowIndex).data();
+        const modal = $('#updateDeviceModal');
+        modal.find('[name=dev_id]').val(data.dev_id);
+        modal.find('[name=dev_eui]').val(data.dev_eui);
+        modal.find('[name=app_id]').val(data.app_id);
+        modal.find('[name=dev_addr]').val(data.dev_addr);
+        modal.find('[name=enabled]').val(data.enabled);
+        modal.find('[name=description]').val(data.description);
+        modal.find('[name=latitude]').val(data.latitude);
+        modal.find('[name=longitude]').val(data.longitude);
+        modal.find('[name=altitude]').val(data.altitude);
+        modal.find('[name=device_profile]').val(data.device_profile);
+        modal.find('[name=network_profile]').val(data.network_profile);
+        modal.modal(true);
+      }
+
+      function deleteDevice(devId) {
+        $.ajax({
+          type: 'DELETE',
+          url: `/api/v1/device/devid/${devId}`,
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (device) => {
+            loadDeviceList();
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+      }
+
+      function deleteDeviceGroup() {
+        const modal = $('#deleteDeviceGroupModal');
+        const deviceGroupData = JSON.parse(deleteDeviceGroupEditor.getValue());
+        $.ajax({
+          type: 'DELETE',
+          url: '/api/v1/device/group',
+          data: JSON.stringify(deviceGroupData),
+          contentType: 'application/json',
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (result) => {
+            modal.modal('hide');
+            const resultModal = $('#deleteDeviceGroupResultModal');
+            deleteDeviceGroupResultEditor = setMonacoEditor(
+              deleteDeviceGroupResultEditor,
+              'deleteDeviceGroupResultEditor',
+              'json',
+              JSON.stringify(result, null, '\t'),
+            );
+            resultModal.modal(true);
+            loadDeviceList();
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+      }
+
+      function updateDevice() {
+        const modal = $('#updateDeviceModal');
+        const name = modal.find('[name=name]').val();
+        const deviceData = {
+          enabled: modal.find('[name=enabled]').val(),
+          description: modal.find('[name=description]').val().trim(),
+          latitude: modal.find('[name=latitude]').val().trim(),
+          longitude: modal.find('[name=longitude]').val().trim(),
+          altitude: modal.find('[name=altitude]').val().trim(),
+        };
+        const devId = modal.find('[name=dev_id]').val().trim();
+        $.ajax({
+          type: 'PUT',
+          url: `/api/v1/device/devid/${devId}`,
+          data: deviceData,
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (user) => {
+            loadDeviceList();
+            modal.modal('hide');
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+      }
+
+      function addDeviceGroup() {
+        const modal = $('#addDeviceGroupModal');
+        const deviceGroupData = JSON.parse(addDeviceGroupEditor.getValue());
+        $.ajax({
+          type: 'POST',
+          url: '/api/v1/device/group',
+          data: JSON.stringify(deviceGroupData),
+          contentType: 'application/json',
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (result) => {
+            modal.modal('hide');
+            const resultModal = $('#addDeviceGroupResultModal');
+            addDeviceGroupResultEditor = setMonacoEditor(
+              addDeviceGroupResultEditor,
+              'addDeviceGroupResultEditor',
+              'json',
+              JSON.stringify(result, null, '\t'),
+            );
+            resultModal.modal(true);
+            loadDeviceList();
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+      }
+
+      function addDevice() {
+        const modal = $('#addDeviceModal');
+        const newDevice = {
+          dev_id: modal.find('[name=dev_id]').val().trim(),
+          dev_eui: modal.find('[name=dev_eui]').val().trim(),
+          app_id: modal.find('[name=app_id]').val().trim(),
+          dev_addr: modal.find('[name=dev_addr]').val().trim(),
+          enabled: modal.find('[name=enabled]').val(),
+          description: modal.find('[name=description]').val().trim(),
+          latitude: modal.find('[name=latitude]').val().trim(),
+          longitude: modal.find('[name=longitude]').val().trim(),
+          altitude: modal.find('[name=altitude]').val().trim(),
+          device_profile: modal.find('[name=device_profile]').val().trim(),
+          network_profile: modal.find('[name=network_profile]').val().trim(),
+        };
+        if (newDevice.dev_id && newDevice.app_id && newDevice.device_profile && newDevice.network_profile) {
+          $.ajax({
+            type: 'POST',
+            url: '/api/v1/device',
+            data: newDevice,
+            headers: {
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+            success: (device) => {
+              loadDeviceList();
+              modal.modal('hide');
+            },
+            error: (err) => {
+              alert(err.responseJSON.error_description);
+            },
+          });
+        }
+      }
+
+      function loadDeviceList() {
+        const table = $('#dataTable').DataTable({
+          destroy: true,
+          // sDom: 'f t<"col-sm-12" i p>',
+          responsive: true,
+          ajax: {
+            url: '/api/v1/device',
+            headers: {
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+            dataSrc: '',
+          },
+          columns: [
+            {
+              data: 'dev_id',
+              className: 'text-wrap',
+              render: (name, type, row, index) => {
+                return `<a href="javascript:openUpdate(${index.row});">${name}</a>`;
+              },
+            },
+            { data: 'dev_eui', className: 'text-wrap' },
+            { data: 'app_id', className: 'text-wrap' },
+            { data: 'device_profile', className: 'text-wrap' },
+            { data: 'network_profile', className: 'text-wrap' },
+            {
+              data: 'device_profile',
+              className: 'text-wrap',
+              render: (name, type, row, index) => {
+                return `<button class="btn" onclick="event.stopPropagation();openDataReading(${index.row});"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-graph-up" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0Zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07Z"/>
+      </svg></button>`;
+              },
+            },
+            {
+              data: 'dev_id',
+              render: (dev_id) => {
+                return `<button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteDevice('${dev_id}')">Delete</button>`;
+              },
+            },
+          ],
+        });
+      }
+
+      //load data
+      $(document).ready(async function () {
+        if (!ACCESS_TOKEN) {
+          location.href = '/login';
+        } else {
+          loadComboData();
+          loadDeviceList();
+        }
+      });
+    </script>
+  </body>
+</html>

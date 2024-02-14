@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+  <%-include('common/header.ejs')%>
+  <body>
+    <%-include('common/menu.ejs')%>
+
+    <div class="container mt-4">
+      <div class="mb-3 text-left">
+        <button class="btn btn-primary" onclick="openAddModal()">Add Object Type</button>
+      </div>
+      <table id="dataTable" class="table table-bordered table-hover" style="width: 100%">
+        <thead>
+          <tr>
+            <th>name</th>
+            <th>object_properties</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+    <!-- Add ObjectType Modal -->
+    <div class="modal fade" id="addObjectTypeModal">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Object Type</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>name</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="name" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>object_properties</label>
+                <div class="col-sm-9">
+                  <pre id="addObjectTypeEditor" class="editor_area"></pre>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="addObjectType()">Add Object Type</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update ObjectType Modal -->
+    <div class="modal fade" id="updateObjectTypeModal">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Update Object Type</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">name</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="name" readonly />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>channel_plan</label>
+                <div class="col-sm-9">
+                  <pre id="updateObjectTypeEditor" class="editor_area"></pre>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="updateObjectType()">Update Object Type</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%-include('common/script.ejs')%>
+
+    <script>
+      let addObjectTypeEditor;
+      let updateObjectTypeEditor;
+
+      function openAddModal() {
+        const modal = $('#addObjectTypeModal');
+        modal.find('[name=name]').val('');
+        const template = [
+          {
+            name: 'sample_temperature',
+            value_type: 'int8',
+            units: 'celcius',
+          },
+          {
+            name: 'sample_humidity',
+            value_type: 'uint8',
+            units: '%RH',
+          },
+          {
+            name: 'sample_pm10',
+            value_type: 'float32',
+            units: 'ug/m3',
+          },
+        ];
+        addObjectTypeEditor = setMonacoEditor(
+          addObjectTypeEditor,
+          'addObjectTypeEditor',
+          'json',
+          JSON.stringify(template, null, '\t'),
+        );
+        modal.modal(true);
+      }
+
+      function openUpdate(rowIndex) {
+        const data = $('#dataTable').DataTable().row(rowIndex).data();
+        updateObjectTypeEditor = setMonacoEditor(
+          updateObjectTypeEditor,
+          'updateObjectTypeEditor',
+          'json',
+          JSON.stringify(data.object_properties, null, '\t'),
+        );
+        const modal = $('#updateObjectTypeModal');
+        modal.find('[name=name]').val(data.name);
+        modal.modal(true);
+      }
+
+      function deleteObjectType(name) {
+        $.ajax({
+          type: 'DELETE',
+          url: `/api/v1/profile/device/objectType/name/${name}`,
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (objectType) => {
+            loadObjectTypeList();
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+      }
+
+      function updateObjectType() {
+        const modal = $('#updateObjectTypeModal');
+        const name = modal.find('[name=name]').val();
+
+        const objectTypeData = {
+          object_properties: JSON.parse(updateObjectTypeEditor.getValue()),
+        };
+
+        $.ajax({
+          type: 'PUT',
+          url: `/api/v1/profile/device/objectType/name/${name}`,
+          data: objectTypeData,
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (user) => {
+            loadObjectTypeList();
+            modal.modal('hide');
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+      }
+
+      function addObjectType() {
+        const modal = $('#addObjectTypeModal');
+        const newObjectType = {
+          name: modal.find('[name=name]').val().trim(),
+          object_properties: JSON.parse(addObjectTypeEditor.getValue()),
+        };
+        if (newObjectType.name && newObjectType.object_properties) {
+          $.ajax({
+            type: 'POST',
+            url: '/api/v1/profile/device/objectType',
+            data: newObjectType,
+            headers: {
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+            success: (objectType) => {
+              loadObjectTypeList();
+              modal.modal('hide');
+            },
+            error: (err) => {
+              alert(err.responseJSON.error_description);
+            },
+          });
+        }
+      }
+
+      function loadObjectTypeList() {
+        const table = $('#dataTable').DataTable({
+          destroy: true,
+          // sDom: 'f t<"col-sm-12" i p>',
+          responsive: true,
+          ajax: {
+            url: '/api/v1/profile/device/objectType',
+            headers: {
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+            dataSrc: '',
+          },
+          columns: [
+            {
+              data: 'name',
+              className: 'text-wrap',
+              render: (name, type, row, index) => {
+                return `<a href="javascript:openUpdate(${index.row});">${name}</a>`;
+              },
+            },
+            {
+              data: 'object_properties',
+              className: 'text-wrap',
+              render: (object_properties) => {
+                return JSON.stringify(object_properties).substring(0, 80) + '...';
+              },
+            },
+            {
+              data: 'name',
+              render: (name) => {
+                return `<button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteObjectType('${name}')">Delete</button>`;
+              },
+            },
+          ],
+        });
+      }
+
+      //load data
+      $(document).ready(async function () {
+        if (!ACCESS_TOKEN) {
+          location.href = '/login';
+        } else {
+          loadObjectTypeList();
+        }
+      });
+    </script>
+  </body>
+</html>

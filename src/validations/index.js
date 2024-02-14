@@ -1,0 +1,9 @@
+module.exports.userValidation = require('./user.validation');
+module.exports.authValidation = require('./auth.validation');
+module.exports.applicationValidation = require('./application.validation');
+module.exports.networkProfileValidation = require('./network-profile.validation');
+module.exports.deviceValidation = require('./device.validation');
+module.exports.deviceProfileValidation = require('./device-profile.validation');
+module.exports.objectTypeValidation = require('./object-type.validation');
+module.exports.deviceDataValidation = require('./device-data.validation');
+module.exports.deviceCommandValidation = require('./device-command.validation');

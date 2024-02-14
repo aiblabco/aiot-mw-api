@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+  <%-include('common/header.ejs')%>
+  <body>
+    <%-include('common/menu.ejs')%>
+
+    <div class="container mt-4">
+      <div class="mb-3 text-left">
+        <!-- <button class="btn btn-primary" onclick="openModelingModal()">Modeling Device Profile</button> -->
+        <button class="btn btn-primary" onclick="openAddModal()">Add Device Profile</button>
+      </div>
+      <table id="dataTable" class="table table-bordered table-hover" style="width: 100%">
+        <thead>
+          <tr>
+            <th>name</th>
+            <th>manufacturer</th>
+            <th>model</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+
+    <!-- Modeling DeviceProfile Modal -->
+    <div class="modal fade" id="modelingDeviceProfileModal">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Modeling Device Profile</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-sm-6">
+                <form>
+                  <div class="form-group row">
+                    <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>name</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="name" />
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>manufacturer</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="manufacturer" />
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>model</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="model" />
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">labels</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="labels" />
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">resources</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="resources" />
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">commands</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="commands" />
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">description</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="description" />
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="col-sm-6">
+                <pre id="modelingResultEditor" class="editor_area"></pre>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="modelingDeviceProfile()">Modeling Device Profile</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add DeviceProfile Modal -->
+    <div class="modal fade" id="addDeviceProfileModal">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Device Profile</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <pre id="addDeviceProfileEditor" class="editor_area"></pre>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="addDeviceProfile()">Add Device Profile</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update DeviceProfile Modal -->
+    <div class="modal fade" id="updateDeviceProfileModal">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Update Device Profile</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <pre id="updateDeviceProfileEditor" class="editor_area"></pre>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="updateDeviceProfile()">Update Device Profile</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%-include('common/script.ejs')%>
+
+    <script>
+      let modelingResultEditor;
+      let addDeviceProfileEditor;
+      let updateDeviceProfileEditor;
+
+      function openModelingModal() {
+        const modal = $('#modelingDeviceProfileModal');
+        modal.find('[name=name]').val('');
+        modal.find('[name=manufacturer]').val('');
+        modal.find('[name=model]').val('');
+        modal.find('[name=labels]').val('[""]');
+        modal.find('[name=resources]').val('[{}]');
+        modal.find('[name=description]').val('');
+        modal.modal(true);
+      }
+
+      function openAddModal() {
+        const modal = $('#addDeviceProfileModal');
+        const deviceProfileTemplate = {
+          name: 'sample',
+          description: 'sample',
+          manufacturer: 'sample',
+          model: 'sample',
+          labels: ['sample'],
+          resources: [
+            {
+              name: 'sample',
+              description: '',
+              type: 'Simple|Object|Binary',
+              value_type: 'string',
+              read_write: 'R',
+              units: '',
+              media_type: 'application/json',
+            },
+          ],
+          commands: [
+            {
+              name: 'sample',
+              read_write: 'R',
+              resources: ['sample'],
+            },
+          ],
+        };
+        addDeviceProfileEditor = setMonacoEditor(
+          addDeviceProfileEditor,
+          'addDeviceProfileEditor',
+          'json',
+          JSON.stringify(deviceProfileTemplate, null, '\t'),
+        );
+        modal.modal(true);
+      }
+
+      function openUpdate(rowIndex) {
+        const data = $('#dataTable').DataTable().row(rowIndex).data();
+        updateDeviceProfileEditor = setMonacoEditor(
+          updateDeviceProfileEditor,
+          'updateDeviceProfileEditor',
+          'json',
+          JSON.stringify(data, null, '\t'),
+        );
+        const modal = $('#updateDeviceProfileModal');
+        modal.modal(true);
+      }
+
+      function deleteDeviceProfile(name) {
+        $.ajax({
+          type: 'DELETE',
+          url: `/api/v1/profile/device/name/${name}`,
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (networkProfile) => {
+            loadDeviceProfileList();
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+      }
+
+      function updateDeviceProfile() {
+        const modal = $('#updateDeviceProfileModal');
+        const deviceProfileData = JSON.parse(updateDeviceProfileEditor.getValue());
+        const name = deviceProfileData.name;
+        delete deviceProfileData.name;
+
+        $.ajax({
+          type: 'PUT',
+          url: `/api/v1/profile/device/name/${name}`,
+          data: JSON.stringify(deviceProfileData),
+          contentType: 'application/json',
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (user) => {
+            loadDeviceProfileList();
+            modal.modal('hide');
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+      }
+
+      function addDeviceProfile() {
+        const modal = $('#addDeviceProfileModal');
+        const deviceProfileData = JSON.parse(addDeviceProfileEditor.getValue());
+        console.log(deviceProfileData);
+        if (deviceProfileData.name && deviceProfileData.manufacturer && deviceProfileData.model) {
+          $.ajax({
+            type: 'POST',
+            url: '/api/v1/profile/device',
+            data: JSON.stringify(deviceProfileData),
+            contentType: 'application/json',
+            headers: {
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+            success: (deviceProfile) => {
+              loadDeviceProfileList();
+              modal.modal('hide');
+            },
+            error: (err) => {
+              alert(err.responseJSON.error_description);
+            },
+          });
+        }
+      }
+      function modelingDeviceProfile() {
+        const modal = $('#modelingDeviceProfileModal');
+        const deviceProfileData = {
+          name: modal.find('[name=name]').val().trim(),
+          manufacturer: modal.find('[name=manufacturer]').val().trim(),
+          model: modal.find('[name=model]').val().trim(),
+          description: modal.find('[name=description]').val().trim(),
+        };
+        try {
+          deviceProfileData.labels = JSON.parse(modal.find('[name=labels]').val().trim());
+        } catch (e) {}
+        try {
+          deviceProfileData.resources = JSON.parse(modal.find('[name=resources]').val().trim());
+        } catch (e) {}
+        try {
+          deviceProfileData.commands = JSON.parse(modal.find('[name=commands]').val().trim());
+        } catch (e) {}
+        console.log(JSON.stringify(deviceProfileData));
+        if (deviceProfileData.name && deviceProfileData.manufacturer && deviceProfileData.model) {
+          $.ajax({
+            type: 'POST',
+            url: '/api/v1/profile/device/model',
+            data: JSON.stringify(deviceProfileData),
+            contentType: 'application/json',
+            headers: {
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+            success: (deviceProfile) => {
+              modelingResultEditor = setMonacoEditor(
+                modelingResultEditor,
+                'modelingResultEditor',
+                'json',
+                JSON.stringify(deviceProfile, null, '\t'),
+                true,
+              );
+            },
+            error: (err) => {
+              alert(err.responseJSON.error_description);
+            },
+          });
+        }
+      }
+
+      function loadDeviceProfileList() {
+        const table = $('#dataTable').DataTable({
+          destroy: true,
+          // sDom: 'f t<"col-sm-12" i p>',
+          responsive: true,
+          ajax: {
+            url: '/api/v1/profile/device',
+            headers: {
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+            dataSrc: '',
+          },
+          columns: [
+            {
+              data: 'name',
+              className: 'text-wrap',
+              render: (name, type, row, index) => {
+                return `<a href="javascript:openUpdate(${index.row});">${name}</a>`;
+              },
+            },
+            { data: 'manufacturer', className: 'text-wrap' },
+            { data: 'model', className: 'text-wrap' },
+            {
+              data: 'name',
+              render: (name) => {
+                return `<button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteDeviceProfile('${name}')">Delete</button>`;
+              },
+            },
+          ],
+        });
+      }
+
+      //load data
+      $(document).ready(async function () {
+        if (!ACCESS_TOKEN) {
+          location.href = '/login';
+        } else {
+          loadDeviceProfileList();
+        }
+      });
+    </script>
+  </body>
+</html>

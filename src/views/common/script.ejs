@@ -1,0 +1,71 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script>
+  var require = { paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs' } };
+</script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/loader.min.js"
+  integrity="sha512-A+6SvPGkIN9Rf0mUXmW4xh7rDvALXf/f0VtOUiHlDUSPknu2kcfz1KzLpOJyL2pO+nZS13hhIjLqVgiQExLJrw=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/editor/editor.main.nls.min.js"
+  integrity="sha512-vnssBu7J9xx5K5e/5HUOF49VAZwEBgZlPStezXzkSJFUU3G/bUBqTqSphzVNBWFQyVWU06HBWQ4eNVP8y+qm5w=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/editor/editor.main.min.js"
+  integrity="sha512-QrOhGBpGTh+e5LUERZsI8OWoCvCpRC7F1FhZkp0BOgwAWbP8N9C/wdduBcqkG+0/mX0kAviEKrdSWIooRBcGAQ=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+<script>
+  $(document).on('ajaxError', (event, res) => {
+    if (res.responseJSON?.error === 'invalid_token') {
+      location.href = '/login';
+    }
+  });
+  function getCookie(name) {
+    const value = '; ' + document.cookie;
+    const parts = value.split('; ' + name + '=');
+    if (parts.length === 2) {
+      return parts.pop().split(';').shift();
+    }
+  }
+
+  function setMonacoEditor(editor, elm, lang, value = '', readonly = false) {
+    value = value == null ? '' : value;
+    if (editor) {
+      // form reset
+      const model = editor.getModel();
+      monaco.editor.setModelLanguage(model, lang);
+      editor.setValue(value);
+    } else {
+      editor = monaco.editor.create(document.getElementById(elm), {
+        value: value,
+        language: lang,
+        theme: 'vs-dark',
+        lineHeight: 19,
+        lineNumbers: 'on',
+        readOnly: readonly,
+        automaticLayout: true,
+        minimap: {
+          enabled: false,
+        },
+        wordWrap: 'on',
+      });
+    }
+    return editor;
+  }
+
+  function deleteCookie(name) {
+    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  }
+
+  let ACCESS_TOKEN = getCookie('access_token');
+</script>

@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+  <%-include('common/header.ejs')%>
+  <body>
+    <%-include('common/menu.ejs')%>
+
+    <div class="container mt-4">
+      <div class="mb-3 text-left">
+        <button class="btn btn-primary" onclick="openAddModal()">Add Network Profile</button>
+      </div>
+      <table id="dataTable" class="table table-bordered table-hover" style="width: 100%">
+        <thead>
+          <tr>
+            <th>name</th>
+            <th>channel_plan</th>
+            <th>lorawan_class</th>
+            <th>activation_type</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+    <!-- Add NetworkProfile Modal -->
+    <div class="modal fade" id="addNetworkProfileModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Network Profile</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>name</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="name" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>channel_plan</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="channel_plan" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>lorawan_class</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="lorawan_class">
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">lorawan_version</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="lorawan_version" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>activation_type</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="activation_type">
+                    <option value="ABP">ABP</option>
+                    <option value="OTAA">OTAA</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">app_s_key</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="app_s_key" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">nwk_s_key</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="nwk_s_key" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">app_key</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="app_key" />
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="addNetworkProfile()">Add Network Profile</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update NetworkProfile Modal -->
+    <div class="modal fade" id="updateNetworkProfileModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Update Network Profile</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">name</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="name" readonly />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>channel_plan</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="channel_plan" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>lorawan_class</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="lorawan_class">
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">lorawan_version</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="lorawan_version" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label"><b class="text-danger">*</b>activation_type</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="activation_type">
+                    <option value="ABP">ABP</option>
+                    <option value="OTAA">OTAA</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">app_s_key</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="app_s_key" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">nwk_s_key</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="nwk_s_key" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">app_key</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="app_key" />
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="updateNetworkProfile()">Update Network Profile</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%-include('common/script.ejs')%>
+
+    <script>
+      function openAddModal() {
+        const modal = $('#addNetworkProfileModal');
+        modal.find('[name=name]').val('');
+        modal.find('[name=channel_plan]').val('');
+        modal.find('[name=lorawan_class]').val('A');
+        modal.find('[name=lorawan_version]').val('');
+        modal.find('[name=activation_type]').val('ABP');
+        modal.find('[name=app_s_key]').val('');
+        modal.find('[name=nwk_s_key]').val('');
+        modal.find('[name=app_key]').val('');
+        modal.modal(true);
+      }
+
+      function openUpdate(rowIndex) {
+        const data = $('#dataTable').DataTable().row(rowIndex).data();
+        const modal = $('#updateNetworkProfileModal');
+        modal.find('[name=name]').val(data.name);
+        modal.find('[name=channel_plan]').val(data.channel_plan);
+        modal.find('[name=lorawan_class]').val(data.lorawan_class);
+        modal.find('[name=lorawan_version]').val(data.lorawan_version);
+        modal.find('[name=activation_type]').val(data.activation_type);
+        modal.find('[name=app_s_key]').val(data.app_s_key);
+        modal.find('[name=nwk_s_key]').val(data.nwk_s_key);
+        modal.find('[name=app_key]').val(data.app_key);
+        modal.modal(true);
+      }
+
+      function deleteNetworkProfile(name) {
+        $.ajax({
+          type: 'DELETE',
+          url: `/api/v1/profile/network/name/${name}`,
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (networkProfile) => {
+            loadNetworkProfileList();
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+      }
+
+      function updateNetworkProfile() {
+        const modal = $('#updateNetworkProfileModal');
+        const name = modal.find('[name=name]').val();
+        const networkProfileData = {
+          channel_plan: modal.find('[name=channel_plan]').val().trim(),
+          lorawan_class: modal.find('[name=lorawan_class]').val().trim(),
+          lorawan_version: modal.find('[name=lorawan_version]').val().trim(),
+          activation_type: modal.find('[name=activation_type]').val().trim(),
+          app_s_key: modal.find('[name=app_s_key]').val().trim(),
+          nwk_s_key: modal.find('[name=nwk_s_key]').val().trim(),
+          app_key: modal.find('[name=app_key]').val().trim(),
+        };
+
+        $.ajax({
+          type: 'PUT',
+          url: `/api/v1/profile/network/name/${name}`,
+          data: networkProfileData,
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (user) => {
+            loadNetworkProfileList();
+            modal.modal('hide');
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+      }
+
+      function addNetworkProfile() {
+        const modal = $('#addNetworkProfileModal');
+        const newNetworkProfile = {
+          name: modal.find('[name=name]').val().trim(),
+          channel_plan: modal.find('[name=channel_plan]').val().trim(),
+          lorawan_class: modal.find('[name=lorawan_class]').val().trim(),
+          lorawan_version: modal.find('[name=lorawan_version]').val().trim(),
+          activation_type: modal.find('[name=activation_type]').val().trim(),
+          app_s_key: modal.find('[name=app_s_key]').val().trim(),
+          nwk_s_key: modal.find('[name=nwk_s_key]').val().trim(),
+          app_key: modal.find('[name=app_key]').val().trim(),
+        };
+        if (
+          newNetworkProfile.name &&
+          newNetworkProfile.channel_plan &&
+          newNetworkProfile.lorawan_class &&
+          newNetworkProfile.activation_type
+        ) {
+          $.ajax({
+            type: 'POST',
+            url: '/api/v1/profile/network',
+            data: newNetworkProfile,
+            headers: {
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+            success: (networkProfile) => {
+              loadNetworkProfileList();
+            modal.modal('hide');
+            },
+            error: (err) => {
+              alert(err.responseJSON.error_description);
+            },
+          });
+        }
+      }
+
+      function loadNetworkProfileList() {
+        const table = $('#dataTable').DataTable({
+          destroy: true,
+          // sDom: 'f t<"col-sm-12" i p>',
+          responsive: true,
+          ajax: {
+            url: '/api/v1/profile/network',
+            headers: {
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+            dataSrc: '',
+          },
+          columns: [
+            {
+              data: 'name',
+              className: 'text-wrap',
+              render: (name, type, row, index) => {
+                return `<a href="javascript:openUpdate(${index.row});">${name}</a>`;
+              },
+            },
+            { data: 'channel_plan', className: 'text-wrap' },
+            { data: 'lorawan_class', className: 'text-wrap' },
+            { data: 'activation_type', className: 'text-wrap' },
+            {
+              data: 'name',
+              render: (name) => {
+                return `<button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteNetworkProfile('${name}')">Delete</button>`;
+              },
+            },
+          ],
+        });
+      }
+
+      //load data
+      $(document).ready(async function () {
+        if (!ACCESS_TOKEN) {
+          location.href = '/login';
+        } else {
+          loadNetworkProfileList();
+        }
+      });
+    </script>
+  </body>
+</html>

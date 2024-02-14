@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%-include('common/header.ejs')%>
+  <body>
+    <%-include('common/menu.ejs')%>
+
+    <div class="container mt-4">
+      <div class="mb-3 text-left">
+        <button class="btn btn-primary" onclick="openAddModal()">Add User</button>
+      </div>
+      <table id="dataTable" class="table table-bordered table-hover" style="width: 100%">
+        <thead>
+          <tr>
+            <th>user_id</th>
+            <th>name</th>
+            <th>role</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add User</h5>
+            <button type="button" class="close" data-dismiss="modal">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label"><b class="text-danger">*</b>user_id</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="user_id" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label"><b class="text-danger">*</b>name</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="name" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label"><b class="text-danger">*</b>password</label>
+                <div class="col-sm-10">
+                  <input type="password" class="form-control" name="password" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label"><b class="text-danger">*</b>role</label>
+                <div class="col-sm-10">
+                  <select class="form-control" name="role">
+                    <option value="ROLE_USER">ROLE_USER</option>
+                    <option value="ROLE_ADMIN">ROLE_ADMIN</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="addUser()">Add User</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update User Modal -->
+    <div class="modal fade" id="updateUserModal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Update User</h5>
+            <button type="button" class="close" data-dismiss="modal">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label">user_id</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="user_id" readonly />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label"><b class="text-danger">*</b>name</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="name" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label">password</label>
+                <div class="col-sm-10">
+                  <input type="password" class="form-control" name="password" placeholder="Enter new password" />
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label"><b class="text-danger">*</b>role</label>
+                <div class="col-sm-10">
+                  <select class="form-control" name="role">
+                    <option value="ROLE_USER">ROLE_USER</option>
+                    <option value="ROLE_ADMIN">ROLE_ADMIN</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="updateUser()">Update User</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%-include('common/script.ejs')%>
+
+    <script>
+      function openAddModal() {
+        const modal = $('#addUserModal');
+        modal.find('[name=user_id]').val('');
+        modal.find('[name=name]').val('');
+        modal.find('[name=password]').val('');
+        modal.find('[name=role]').val('ROLE_USER');
+        modal.modal(true);
+      }
+
+      function openUpdate(rowIndex) {
+        const data = $('#dataTable').DataTable().row(rowIndex).data();
+        const modal = $('#updateUserModal');
+        modal.find('[name=user_id]').val(data.user_id);
+        modal.find('[name=name]').val(data.name);
+        modal.find('[name=role]').val(data.role);
+        modal.modal(true);
+      }
+
+      function deleteUser(userId) {
+        $.ajax({
+          type: 'DELETE',
+          url: `/api/v1/user/${userId}`,
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (user) => {
+            loadUserList();            
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+      }
+
+      function updateUser() {
+        const modal = $('#updateUserModal');
+        const userId = modal.find('[name=user_id]').val();
+        const userData = {
+          name: modal.find('[name=name]').val().trim(),
+          role: modal.find('[name=role]').val(),
+          password: modal.find('[name=password]').val().trim(),
+        };
+
+        if (!userData.password) {
+          delete userData.password;
+        }
+
+        $.ajax({
+          type: 'PUT',
+          url: `/api/v1/user/${userId}`,
+          data: userData,
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+          },
+          success: (user) => {
+            loadUserList();
+            modal.modal('hide');
+          },
+          error: (err) => {
+            alert(err.responseJSON.error_description);
+          },
+        });
+      }
+
+      function addUser() {
+        const modal = $('#addUserModal');
+        const newUser = {
+          user_id: modal.find('[name=user_id]').val().trim(),
+          name: modal.find('[name=name]').val().trim(),
+          password: modal.find('[name=password]').val().trim(),
+          role: modal.find('[name=role]').val(),
+        };
+        if (newUser.user_id && newUser.name && newUser.password) {
+          $.ajax({
+            type: 'POST',
+            url: '/api/v1/user',
+            data: newUser,
+            headers: {
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+            success: (user) => {
+              loadUserList();
+            modal.modal('hide');
+            },
+            error: (err) => {
+              alert(err.responseJSON.error_description);
+            },
+          });
+        }
+      }
+
+      function loadUserList() {
+        const table = $('#dataTable').DataTable({
+          destroy: true,
+          responsive: true,
+          ajax: {
+            url: '/api/v1/user',
+            headers: {
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+            dataSrc: '',
+          },
+          columns: [
+            {
+              data: 'user_id',
+              className: 'text-wrap',
+              render: (userId, type, row, index) => {
+                return `<a href="javascript:openUpdate(${index.row});">${userId}</a>`;
+              },
+            },
+            { data: 'name', className: 'text-wrap' },
+            { data: 'role', className: 'text-wrap' },
+            {
+              data: 'user_id',
+              render: (userId) => {
+                return `<button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteUser('${userId}')">Delete</button>`;
+              },
+            },
+          ],
+        });
+      }
+
+      //load data
+      $(document).ready(async function () {
+        if (!ACCESS_TOKEN) {
+          location.href = '/login';
+        } else {
+          loadUserList();
+        }
+      });
+    </script>
+  </body>
+</html>

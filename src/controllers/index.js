@@ -1,0 +1,11 @@
+module.exports.userController = require('./user.controller');
+module.exports.authController = require('./auth.controller');
+module.exports.commonController = require('./common.controller');
+module.exports.applicationController = require('./application.controller');
+module.exports.networkProfileController = require('./network-profile.controller');
+module.exports.deviceModelController = require('./device-model.controller');
+module.exports.deviceController = require('./device.controller');
+module.exports.deviceProfileController = require('./device-profile.controller');
+module.exports.objectTypeController = require('./object-type.controller');
+module.exports.deviceDataController = require('./device-data.controller');
+module.exports.deviceCommandController = require('./device-command.controller');
